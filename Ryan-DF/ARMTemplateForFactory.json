@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
 		},
+		"DynamicAzureDatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'DynamicAzureDatabase'"
+		},
 		"rmcelhinnyKV_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://rmcelhinnyKV.vault.azure.net/"
@@ -66,7 +70,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "select \ncast(ControlTableKey as varchar(10)) as ControlTableKey ,\nProcessName,\nSourceSchemaName,\nSourceTableName,\nSourceServerName,\nSourceDatabaseName,\nSourceUserName,\nSourcePassword,\nTargetTableSchema,\nTargetTableName,\nContainerName,\nDelimiter\nfrom ProcessMetadata.ControlTable\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
+									"value": "select \ncast(ControlTableKey as varchar(10)) as ControlTableKey ,\nProcessName,\nSourceSchemaName,\nSourceTableName,\nSourceServerName,\nSourceDatabaseName,\nSourceUserName,\nSourcePassword,\nTargetTableSchema,\nTargetTableName,\nTargetServerName,\nTargetDatabaseName,\nTargetUserName,\nTargetPassword,\nContainerName,\nDelimiter\nfrom ProcessMetadata.ControlTable\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -245,6 +249,112 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "Extract DDL",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "SysQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@variables('SysQuery')",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "delete from ProcessMetadata.SourceTableColumns where ControlTableKey = @{variables('ControlTableKey')}",
+												"type": "Expression"
+											},
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DynamicDataset",
+											"type": "DatasetReference",
+											"parameters": {
+												"SchemaName": {
+													"value": "@variables('SourceSchemaName')",
+													"type": "Expression"
+												},
+												"TableName": {
+													"value": "@variables('SourceTableName')",
+													"type": "Expression"
+												},
+												"ServerName": {
+													"value": "@variables('SourceServerName')",
+													"type": "Expression"
+												},
+												"DatabaseName": {
+													"value": "@variables('SourceDatabaseName')",
+													"type": "Expression"
+												},
+												"UserName": {
+													"value": "@variables('SourceUserName')",
+													"type": "Expression"
+												},
+												"Password": {
+													"value": "@variables('SourcePassword')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DynamicDataset",
+											"type": "DatasetReference",
+											"parameters": {
+												"SchemaName": "ProcessMetadata",
+												"TableName": "SourceTableColumns",
+												"ServerName": {
+													"value": "@item().TargetServerName",
+													"type": "Expression"
+												},
+												"DatabaseName": {
+													"value": "@item().TargetDatabaseName",
+													"type": "Expression"
+												},
+												"UserName": {
+													"value": "@item().TargetUserName",
+													"type": "Expression"
+												},
+												"Password": {
+													"value": "@item().TargetPassword",
+													"type": "Expression"
+												}
+											}
+										}
+									]
 								}
 							]
 						}
@@ -290,7 +400,97 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/AzureSQLDatabase')]"
+				"[concat(variables('factoryId'), '/datasets/AzureSQLDatabase')]",
+				"[concat(variables('factoryId'), '/datasets/DynamicDataset')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSQLDatabase')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AZDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AZDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DynamicAzureDatabase",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DynamicAzureDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DynamicDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DynamicAzureDatabase",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"ServerName": {
+							"value": "@dataset().ServerName",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"SchemaName": {
+						"type": "string"
+					},
+					"TableName": {
+						"type": "string"
+					},
+					"ServerName": {
+						"type": "string"
+					},
+					"DatabaseName": {
+						"type": "string"
+					},
+					"UserName": {
+						"type": "string"
+					},
+					"Password": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().SchemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().TableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DynamicAzureDatabase')]"
 			]
 		},
 		{
@@ -320,21 +520,43 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSQLDatabase')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/DynamicAzureDatabase')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AZDatabase",
-					"type": "LinkedServiceReference"
+				"parameters": {
+					"ServerName": {
+						"type": "string"
+					},
+					"DatabaseName": {
+						"type": "string"
+					},
+					"UserName": {
+						"type": "string"
+					},
+					"Password": {
+						"type": "string"
+					}
 				},
 				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('DynamicAzureDatabase_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "rmcelhinnyKV",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().Password",
+							"type": "Expression"
+						}
+					}
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AZDatabase')]"
+				"[concat(variables('factoryId'), '/linkedServices/rmcelhinnyKV')]"
 			]
 		},
 		{
