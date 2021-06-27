@@ -216,6 +216,70 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "SysQuery",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@variables('SysQuery')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DynamicDataset",
+									"type": "DatasetReference",
+									"parameters": {
+										"SourceSchemaName": {
+											"value": "@variables('SourceSchemaName')",
+											"type": "Expression"
+										},
+										"SourceTableName": {
+											"value": "@variables('SourceTableName')",
+											"type": "Expression"
+										},
+										"SourceServerName": {
+											"value": "@variables('SourceServerName')",
+											"type": "Expression"
+										},
+										"SourceDatabaseName": {
+											"value": "@variables('SourceDatabaseName')",
+											"type": "Expression"
+										},
+										"SourceUserName": {
+											"value": "@variables('SourceUserName')",
+											"type": "Expression"
+										},
+										"SourcePassword": {
+											"value": "@variables('SourcePassword')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					]
 				}
