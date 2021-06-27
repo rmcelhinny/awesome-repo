@@ -247,12 +247,7 @@
 									"partitionOption": "None"
 								},
 								"sink": {
-									"type": "AzureSqlSink",
-									"preCopyScript": {
-										"value": "delete from ProcessMetadata.SourceTableColumns where ControlTableKey = @{variables('ControlTableKey')}",
-										"type": "Expression"
-									},
-									"disableMetricsCollection": false
+									"type": "AzureSqlSink"
 								},
 								"enableStaging": false,
 								"translator": {
@@ -269,7 +264,7 @@
 									"referenceName": "DynamicDataset",
 									"type": "DatasetReference",
 									"parameters": {
-										"SchemaName": {
+										"TableSchema": {
 											"value": "@variables('SourceSchemaName')",
 											"type": "Expression"
 										},
@@ -278,7 +273,7 @@
 											"type": "Expression"
 										},
 										"ServerName": {
-											"value": "@variables('SourceServerName')",
+											"value": "@variables('SourceSchemaName')",
 											"type": "Expression"
 										},
 										"DatabaseName": {
@@ -301,7 +296,7 @@
 									"referenceName": "DynamicDataset",
 									"type": "DatasetReference",
 									"parameters": {
-										"SchemaName": "ProcessMetadata",
+										"TableSchema": "ProcessMetadata",
 										"TableName": "SourceTableColumns",
 										"ServerName": {
 											"value": "@item().TargetServerName",
