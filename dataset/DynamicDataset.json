@@ -8,6 +8,10 @@
 				"ServerName": {
 					"value": "@dataset().ServerName",
 					"type": "Expression"
+				},
+				"DatabaseName": {
+					"value": "@dataset().DatabaseName",
+					"type": "Expression"
 				}
 			}
 		},
