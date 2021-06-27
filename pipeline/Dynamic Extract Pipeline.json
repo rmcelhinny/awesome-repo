@@ -108,6 +108,19 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "SourceDatabaseName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SourceDatabaseName",
+								"value": {
+									"value": "@item().SourceDatabaseName",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
