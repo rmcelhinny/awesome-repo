@@ -1,0 +1,42 @@
+{
+	"name": "DynamicDataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DynamicAzureDatabase",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"SourceSchemaName": {
+				"type": "string"
+			},
+			"SourceTableName": {
+				"type": "string"
+			},
+			"SourceServerName": {
+				"type": "string"
+			},
+			"SourceDatabaseName": {
+				"type": "string"
+			},
+			"SourceUserName": {
+				"type": "string"
+			},
+			"SourcePassword": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().SourceSchemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().SourceTableName",
+				"type": "Expression"
+			}
+		}
+	}
+}
