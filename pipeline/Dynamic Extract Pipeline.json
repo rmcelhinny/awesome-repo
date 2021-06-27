@@ -269,27 +269,27 @@
 									"referenceName": "DynamicDataset",
 									"type": "DatasetReference",
 									"parameters": {
-										"SourceSchemaName": {
+										"SchemaName": {
 											"value": "@variables('SourceSchemaName')",
 											"type": "Expression"
 										},
-										"SourceTableName": {
+										"TableName": {
 											"value": "@variables('SourceTableName')",
 											"type": "Expression"
 										},
-										"SourceServerName": {
+										"ServerName": {
 											"value": "@variables('SourceServerName')",
 											"type": "Expression"
 										},
-										"SourceDatabaseName": {
+										"DatabaseName": {
 											"value": "@variables('SourceDatabaseName')",
 											"type": "Expression"
 										},
-										"SourceUserName": {
+										"UserName": {
 											"value": "@variables('SourceUserName')",
 											"type": "Expression"
 										},
-										"SourcePassword": {
+										"Password": {
 											"value": "@variables('SourcePassword')",
 											"type": "Expression"
 										}
@@ -301,21 +301,21 @@
 									"referenceName": "DynamicDataset",
 									"type": "DatasetReference",
 									"parameters": {
-										"SourceSchemaName": "ProcessMetadata",
-										"SourceTableName": "SourceTableColumns",
-										"SourceServerName": {
+										"SchemaName": "ProcessMetadata",
+										"TableName": "SourceTableColumns",
+										"ServerName": {
 											"value": "@item().TargetServerName",
 											"type": "Expression"
 										},
-										"SourceDatabaseName": {
+										"DatabaseName": {
 											"value": "@item().TargetDatabaseName",
 											"type": "Expression"
 										},
-										"SourceUserName": {
+										"UserName": {
 											"value": "@item().TargetUserName",
 											"type": "Expression"
 										},
-										"SourcePassword": {
+										"Password": {
 											"value": "@item().TargetPassword",
 											"type": "Expression"
 										}
