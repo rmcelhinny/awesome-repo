@@ -121,6 +121,32 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "SourceUserName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SourceUserName",
+								"value": {
+									"value": "@item().SourceUserName",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "SourcePassword",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SourcePassword",
+								"value": {
+									"value": "@item().SourcePassword",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
