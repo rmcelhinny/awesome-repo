@@ -1,6 +1,11 @@
 {
 	"name": "Dynamic Extract Pipeline",
 	"properties": {
+		"variables": {
+			"ProcessName": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Azure Extract"
 		},
