@@ -1,6 +1,26 @@
 {
 	"name": "Dynamic Extract Pipeline",
 	"properties": {
+		"activities": [
+			{
+				"name": "ProcessName",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ProcessName",
+					"value": {
+						"value": "@pipeline().parameters.ProcessName",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"ProcessName": {
+				"type": "string"
+			}
+		},
 		"variables": {
 			"ProcessName": {
 				"type": "String"
