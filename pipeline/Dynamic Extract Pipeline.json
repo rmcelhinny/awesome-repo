@@ -246,7 +246,18 @@
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "AzureSqlSink"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
 							},
 							"inputs": [
 								{
@@ -275,6 +286,32 @@
 										},
 										"SourcePassword": {
 											"value": "@variables('SourcePassword')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DynamicDataset",
+									"type": "DatasetReference",
+									"parameters": {
+										"SourceSchemaName": "ProcessMetadata",
+										"SourceTableName": "SourceTableColumns",
+										"SourceServerName": {
+											"value": "@item().TargetServerName",
+											"type": "Expression"
+										},
+										"SourceDatabaseName": {
+											"value": "@item().TargetDatabaseName",
+											"type": "Expression"
+										},
+										"SourceUserName": {
+											"value": "@item().TargetUserName",
+											"type": "Expression"
+										},
+										"SourcePassword": {
+											"value": "@item().TargetPassword",
 											"type": "Expression"
 										}
 									}
