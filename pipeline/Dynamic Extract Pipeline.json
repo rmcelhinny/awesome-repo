@@ -38,7 +38,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select \ncast(ControlTableKey as varchar(10)) as ControlTableKey ,\nProcessName,\nSourceSchemaName,\nSourceTableName,\nSourceServerName,\nSourceDatabaseName,\nSourceUserName,\nSourcePassword,\nTargetTableSchema,\nTargetTableName,\nContainerName,\nDelimiter\nfrom ProcessMetadata.ControlTable\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
+							"value": "select \ncast(ControlTableKey as varchar(10)) as ControlTableKey ,\nProcessName,\nSourceSchemaName,\nSourceTableName,\nSourceServerName,\nSourceDatabaseName,\nSourceUserName,\nSourcePassword,\nTargetTableSchema,\nTargetTableName,\nTargetServerName,\nTargetDatabaseName,\nTargetUserName,\nTargetPassword,\nContainerName,\nDelimiter\nfrom ProcessMetadata.ControlTable\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -247,7 +247,12 @@
 									"partitionOption": "None"
 								},
 								"sink": {
-									"type": "AzureSqlSink"
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "delete from ProcessMetadata.SourceTableColumns where ControlTableKey = @{variables('ControlTableKey')}",
+										"type": "Expression"
+									},
+									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
 								"translator": {
