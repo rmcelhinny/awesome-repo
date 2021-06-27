@@ -84,7 +84,7 @@
 							}
 						},
 						{
-							"name": "Set variable1",
+							"name": "SourceSchemaName",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"userProperties": []
@@ -105,7 +105,7 @@
 			"SourceTableName": {
 				"type": "String"
 			},
-			"TargetTableSchema": {
+			"SourceSchemaName": {
 				"type": "String"
 			}
 		},
