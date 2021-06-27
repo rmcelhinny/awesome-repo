@@ -12,6 +12,10 @@
 				"DatabaseName": {
 					"value": "@dataset().DatabaseName",
 					"type": "Expression"
+				},
+				"UserName": {
+					"value": "@dataset().UserName",
+					"type": "Expression"
 				}
 			}
 		},
