@@ -6,22 +6,22 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"SourceSchemaName": {
+			"SchemaName": {
 				"type": "string"
 			},
-			"SourceTableName": {
+			"TableName": {
 				"type": "string"
 			},
-			"SourceServerName": {
+			"ServerName": {
 				"type": "string"
 			},
-			"SourceDatabaseName": {
+			"DatabaseName": {
 				"type": "string"
 			},
-			"SourceUserName": {
+			"UserName": {
 				"type": "string"
 			},
-			"SourcePassword": {
+			"Password": {
 				"type": "string"
 			}
 		},
