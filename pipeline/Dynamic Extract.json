@@ -1,0 +1,9 @@
+{
+	"name": "Dynamic Extract",
+	"properties": {
+		"folder": {
+			"name": "POC"
+		},
+		"annotations": []
+	}
+}
