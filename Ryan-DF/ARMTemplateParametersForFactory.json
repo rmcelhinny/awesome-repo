@@ -10,6 +10,9 @@
 		},
 		"AzureBlobStorage_connectionString": {
 			"value": ""
+		},
+		"rmcelhinnyKV_properties_typeProperties_baseUrl": {
+			"value": "https://rmcelhinnyKV.vault.azure.net/"
 		}
 	}
 }
