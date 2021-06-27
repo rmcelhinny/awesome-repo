@@ -1,0 +1,10 @@
+{
+	"name": "rmcelhinnyKV",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://rmcelhinnyKV.vault.azure.net/"
+		}
+	}
+}
