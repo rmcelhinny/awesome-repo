@@ -1,0 +1,35 @@
+{
+	"name": "DynamicAzureDatabase",
+	"properties": {
+		"parameters": {
+			"SourceServerName": {
+				"type": "string"
+			},
+			"SourceDatabaseName": {
+				"type": "string"
+			},
+			"SourceUserName": {
+				"type": "string"
+			},
+			"SourcePassword": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().SourceServerName};Initial Catalog=@{linkedService().SourceDatabaseName};User ID=@{linkedService().SourceUserName}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "rmcelhinnyKV",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().SourcePassword",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
