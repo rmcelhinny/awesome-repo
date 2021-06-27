@@ -299,19 +299,19 @@
 										"TableSchema": "ProcessMetadata",
 										"TableName": "SourceTableColumns",
 										"ServerName": {
-											"value": "@item().TargetServerName",
+											"value": "rmcelhinny-db.database.windows.net",
 											"type": "Expression"
 										},
 										"DatabaseName": {
-											"value": "@item().TargetDatabaseName",
+											"value": "rmcelhinny-db",
 											"type": "Expression"
 										},
 										"UserName": {
-											"value": "@item().TargetUserName",
+											"value": "rmcelhinny",
 											"type": "Expression"
 										},
 										"Password": {
-											"value": "@item().TargetPassword",
+											"value": "rmcelhinnyPWD",
 											"type": "Expression"
 										}
 									}
