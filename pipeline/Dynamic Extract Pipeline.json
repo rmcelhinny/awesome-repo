@@ -38,7 +38,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select \nProcessName,\nSourceSchemaName,\nSourceTableName,\nSourceServerName,\nSourceDatabaseName,\nSourceUserName,\nSourcePassword,\nTargetTableSchema,\nTargetTableName,\nContainerName,\nDelimiter\nfrom ProcessMetadata.ControlTable\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
+							"value": "select \nControlTableKey,\nProcessName,\nSourceSchemaName,\nSourceTableName,\nSourceServerName,\nSourceDatabaseName,\nSourceUserName,\nSourcePassword,\nTargetTableSchema,\nTargetTableName,\nContainerName,\nDelimiter\nfrom ProcessMetadata.ControlTable\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -147,6 +147,19 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "ControlTableKey",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "ControlTableKey",
+								"value": {
+									"value": "@item().ControlTableKey",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -177,6 +190,12 @@
 				"type": "String"
 			},
 			"SourcePassword": {
+				"type": "String"
+			},
+			"SysQuery": {
+				"type": "String"
+			},
+			"ControlTableKey": {
 				"type": "String"
 			}
 		},
