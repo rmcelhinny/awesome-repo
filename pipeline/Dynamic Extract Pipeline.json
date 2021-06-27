@@ -1,0 +1,9 @@
+{
+	"name": "Dynamic Extract Pipeline",
+	"properties": {
+		"folder": {
+			"name": "Azure Extract"
+		},
+		"annotations": []
+	}
+}
