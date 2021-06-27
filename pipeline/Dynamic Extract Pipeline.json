@@ -95,6 +95,19 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "SourceServerName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SourceServerName",
+								"value": {
+									"value": "@item().SourceServerName",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
