@@ -16,6 +16,10 @@
 				"UserName": {
 					"value": "@dataset().UserName",
 					"type": "Expression"
+				},
+				"Password": {
+					"value": "@dataset().Password",
+					"type": "Expression"
 				}
 			}
 		},
