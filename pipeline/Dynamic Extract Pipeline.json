@@ -87,7 +87,14 @@
 							"name": "SourceSchemaName",
 							"type": "SetVariable",
 							"dependsOn": [],
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SourceSchemaName",
+								"value": {
+									"value": "@item().SourceSchemaName",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -106,6 +113,18 @@
 				"type": "String"
 			},
 			"SourceSchemaName": {
+				"type": "String"
+			},
+			"SourceServerName": {
+				"type": "String"
+			},
+			"SourceDatabaseName": {
+				"type": "String"
+			},
+			"SourceUserName": {
+				"type": "String"
+			},
+			"SourcePassword": {
 				"type": "String"
 			}
 		},
