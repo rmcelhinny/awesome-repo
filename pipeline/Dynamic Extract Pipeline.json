@@ -14,6 +14,83 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Fetch MetaData",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "ProcessName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select \nProcessName,\nSourceSchemaName,\nSourceTableName,\nSourceServerName,\nSourceDatabaseName,\nSourceUserName,\nSourcePassword,\nTargetTableSchema,\nTargetTableName,\nContainerName,\nDelimiter\nfrom ProcessMetadata.ControlTable\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSQLDatabase",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Extract and Populate DDL",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Fetch MetaData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Fetch MetaData').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "SourceTableName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "SourceTableName",
+								"value": {
+									"value": "@item().SourceTableName",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": []
+						}
+					]
+				}
 			}
 		],
 		"parameters": {
@@ -23,6 +100,12 @@
 		},
 		"variables": {
 			"ProcessName": {
+				"type": "String"
+			},
+			"SourceTableName": {
+				"type": "String"
+			},
+			"TargetTableSchema": {
 				"type": "String"
 			}
 		},
