@@ -30,11 +30,11 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": {
-				"value": "@dataset().SourceSchemaName",
+				"value": "@dataset().SchemaName",
 				"type": "Expression"
 			},
 			"table": {
-				"value": "@dataset().SourceTableName",
+				"value": "@dataset().TableName",
 				"type": "Expression"
 			}
 		}
