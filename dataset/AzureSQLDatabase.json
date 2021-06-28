@@ -60,10 +60,6 @@
 				"name": "SQLDataType",
 				"type": "varchar"
 			}
-		],
-		"typeProperties": {
-			"schema": "ProcessMetadata",
-			"table": "SourceTableColumns"
-		}
+		]
 	}
 }
