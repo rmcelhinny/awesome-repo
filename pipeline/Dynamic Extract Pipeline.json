@@ -760,6 +760,9 @@
 		"parameters": {
 			"ProcessName": {
 				"type": "string"
+			},
+			"RunKey": {
+				"type": "string"
 			}
 		},
 		"variables": {
