@@ -78,11 +78,94 @@
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
+				"schema": [
+					{
+						"name": "ControlTableKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SourceTableSchema",
+						"type": "varchar"
+					},
+					{
+						"name": "SourceTableName",
+						"type": "varchar"
+					},
+					{
+						"name": "OrdinalPosition",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SourceColumn",
+						"type": "varchar"
+					},
+					{
+						"name": "SourceColumnDataType",
+						"type": "varchar"
+					},
+					{
+						"name": "Length",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Scale",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Nullable",
+						"type": "bit"
+					},
+					{
+						"name": "DatabricksDataTypeExternal",
+						"type": "varchar"
+					},
+					{
+						"name": "DatabricksDataType",
+						"type": "varchar"
+					},
+					{
+						"name": "SQLDataType",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "ProcessMetadata",
+					"table": "SourceTableColumns"
+				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AZDatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "test.txt",
+						"container": "azureefileextract"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage')]"
 			]
 		},
 		{
@@ -496,7 +579,7 @@
 									"typeProperties": {
 										"variableName": "SysQuery",
 										"value": {
-											"value": "select\n@{variables('ControlTableKey')} as ControlTabkleKey,\n@{variables('SourceSchemaName')} as SourceSchema,\n@{variables('SourceTableName')} as SourceTableName,\nd.name as SourceColumnDataType,\nb.column_id as OrdinalPosition,\ncase when d.name like '%numeric%' OR d.name like '%float%' OR d.name like '%decimal%' then b.precision\n    WHEN D.name LIKE '%money%' THEN 34\nelse b.max_length end as Length,\nCASE WHEN D.name LIKE '%money%' THEN 4 ELSE b.scale end as Scale,\nb.is_nullable as Nullable,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%timestamp%' then 'string'  \n     when d.name like '%date%' then 'string'  \n     when d.name like '%time%' then 'string'  \n     when d.name like '%number%' then 'float'\n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataTypeExternal,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%time%' or d.name like '%date%' then 'timestamp'\n     when d.name like '%number%' then 'float'  \n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataType,\nd.name as SQLDataType\n from sys.tables a\njoin sys.columns b\non a.object_id = b.object_id\njoin sys.schemas c\non a.schema_id = c.schema_id\njoin sys.types d\non b.system_type_id = d.system_type_id\nwhere d.name <> 'sysname'\nand a.name = '@{variables('SourceTableName')}'",
+											"value": "select\n@{variables('ControlTableKey')} as ControlTableKey,\n'@{variables('SourceSchemaName')}' as SourceSchema,\n'@{variables('SourceTableName')}' as SourceTableName,\nd.name as SourceColumnDataType,\nb.column_id as OrdinalPosition,\ncase when d.name like '%numeric%' OR d.name like '%float%' OR d.name like '%decimal%' then b.precision\n    WHEN D.name LIKE '%money%' THEN 34\nelse b.max_length end as Length,\nCASE WHEN D.name LIKE '%money%' THEN 4 ELSE b.scale end as Scale,\nb.is_nullable as Nullable,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%timestamp%' then 'string'  \n     when d.name like '%date%' then 'string'  \n     when d.name like '%time%' then 'string'  \n     when d.name like '%number%' then 'float'\n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataTypeExternal,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%time%' or d.name like '%date%' then 'timestamp'\n     when d.name like '%number%' then 'float'  \n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataType,\nd.name as SQLDataType\n from sys.tables a\njoin sys.columns b\non a.object_id = b.object_id\njoin sys.schemas c\non a.schema_id = c.schema_id\njoin sys.types d\non b.system_type_id = d.system_type_id\nwhere d.name <> 'sysname'\nand a.name = '@{variables('SourceTableName')}'",
 											"type": "Expression"
 										}
 									}
@@ -712,6 +795,455 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/AzureSQLDatabase')]",
 				"[concat(variables('factoryId'), '/datasets/DynamicDataset')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dynamic Extract Pipeline_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ProcessName",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "ProcessName",
+							"value": {
+								"value": "@pipeline().parameters.ProcessName",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Fetch MetaData",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "ProcessName",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select \ncast(ControlTableKey as varchar(10)) as ControlTableKey ,\nProcessName,\nSourceSchemaName,\nSourceTableName,\nSourceServerName,\nSourceDatabaseName,\nSourceUserName,\nSourcePassword,\nTargetTableSchema,\nTargetTableName,\nTargetServerName,\nTargetDatabaseName,\nTargetUserName,\nTargetPassword,\nContainerName,\nDelimiter\nfrom ProcessMetadata.ControlTable\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSQLDatabase",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Extract and Populate DDL",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Fetch MetaData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Fetch MetaData').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "SourceTableName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SourceTableName",
+										"value": {
+											"value": "@item().SourceTableName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SourceSchemaName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SourceSchemaName",
+										"value": {
+											"value": "@item().SourceSchemaName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SourceServerName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SourceServerName",
+										"value": {
+											"value": "@item().SourceServerName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SourceDatabaseName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SourceDatabaseName",
+										"value": {
+											"value": "@item().SourceDatabaseName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SourceUserName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SourceUserName",
+										"value": {
+											"value": "@item().SourceUserName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SourcePassword",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SourcePassword",
+										"value": {
+											"value": "@item().SourcePassword",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "ControlTableKey",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "ControlTableKey",
+										"value": {
+											"value": "@item().ControlTableKey",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "SysQuery",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "SourceTableName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SourceSchemaName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SourceServerName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SourceDatabaseName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SourceUserName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "SourcePassword",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "ControlTableKey",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "TargetServerName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "TargetDatabaseName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "TargetUserName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "TargetPassword",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SysQuery",
+										"value": {
+											"value": "select\n@{variables('ControlTableKey')} as ControlTableKey,\n'@{variables('SourceSchemaName')}' as SourceSchema,\n'@{variables('SourceTableName')}' as SourceTableName,\nd.name as SourceColumnDataType,\nb.column_id as OrdinalPosition,\ncase when d.name like '%numeric%' OR d.name like '%float%' OR d.name like '%decimal%' then b.precision\n    WHEN D.name LIKE '%money%' THEN 34\nelse b.max_length end as Length,\nCASE WHEN D.name LIKE '%money%' THEN 4 ELSE b.scale end as Scale,\nb.is_nullable as Nullable,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%timestamp%' then 'string'  \n     when d.name like '%date%' then 'string'  \n     when d.name like '%time%' then 'string'  \n     when d.name like '%number%' then 'float'\n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataTypeExternal,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%time%' or d.name like '%date%' then 'timestamp'\n     when d.name like '%number%' then 'float'  \n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataType,\nd.name as SQLDataType\n from sys.tables a\njoin sys.columns b\non a.object_id = b.object_id\njoin sys.schemas c\non a.schema_id = c.schema_id\njoin sys.types d\non b.system_type_id = d.system_type_id\nwhere d.name <> 'sysname'\nand a.name = '@{variables('SourceTableName')}'",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Extract DDL",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "SysQuery",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@variables('SysQuery')",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DynamicDataset",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableSchema": {
+													"value": "@variables('SourceSchemaName')",
+													"type": "Expression"
+												},
+												"TableName": {
+													"value": "@variables('SourceTableName')",
+													"type": "Expression"
+												},
+												"ServerName": {
+													"value": "@variables('SourceSchemaName')",
+													"type": "Expression"
+												},
+												"DatabaseName": {
+													"value": "@variables('SourceDatabaseName')",
+													"type": "Expression"
+												},
+												"UserName": {
+													"value": "@variables('SourceUserName')",
+													"type": "Expression"
+												},
+												"Password": {
+													"value": "@variables('SourcePassword')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DelimitedText1",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								},
+								{
+									"name": "TargetServerName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TargetServerName",
+										"value": {
+											"value": "@item().TargetServerName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "TargetDatabaseName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TargetDatabaseName",
+										"value": {
+											"value": "@item().TargetDatabaseName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "TargetUserName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TargetUserName",
+										"value": {
+											"value": "@item().TargetUserName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "TargetPassword",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TargetPassword",
+										"value": {
+											"value": "@item().TargetPassword",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"ProcessName": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"ProcessName": {
+						"type": "String"
+					},
+					"SourceTableName": {
+						"type": "String"
+					},
+					"SourceSchemaName": {
+						"type": "String"
+					},
+					"SourceServerName": {
+						"type": "String"
+					},
+					"SourceDatabaseName": {
+						"type": "String"
+					},
+					"SourceUserName": {
+						"type": "String"
+					},
+					"SourcePassword": {
+						"type": "String"
+					},
+					"SysQuery": {
+						"type": "String"
+					},
+					"ControlTableKey": {
+						"type": "String"
+					},
+					"TargetServerName": {
+						"type": "String"
+					},
+					"TargetDatabaseName": {
+						"type": "String"
+					},
+					"TargetUserName": {
+						"type": "String"
+					},
+					"TargetPassword": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Azure Extract"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/AzureSQLDatabase')]",
+				"[concat(variables('factoryId'), '/datasets/DynamicDataset')]",
+				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]"
 			]
 		}
 	]
