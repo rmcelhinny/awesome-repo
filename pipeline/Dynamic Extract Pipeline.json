@@ -645,7 +645,10 @@
 										"type": "Int32"
 									},
 									"SourceTableName": {
-										"value": "",
+										"value": {
+											"value": "@{variables('SourceSchemaName')}.@{variables('SourceTableName')}",
+											"type": "Expression"
+										},
 										"type": "String"
 									}
 								}
