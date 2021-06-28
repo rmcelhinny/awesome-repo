@@ -1,6 +1,11 @@
 {
 	"name": "File Extract",
 	"properties": {
+		"parameters": {
+			"ProcessName": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }
