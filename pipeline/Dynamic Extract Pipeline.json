@@ -297,7 +297,7 @@
 											"type": "Expression"
 										},
 										"ServerName": {
-											"value": "@variables('SourceSchemaName')",
+											"value": "@variables('SourceServerName')",
 											"type": "Expression"
 										},
 										"DatabaseName": {
