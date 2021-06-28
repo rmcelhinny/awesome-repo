@@ -544,7 +544,14 @@
 								{
 									"name": "File Extract",
 									"type": "Copy",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "FileLogDetailInsert",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "7.00:00:00",
 										"retry": 0,
@@ -628,6 +635,157 @@
 											}
 										}
 									]
+								},
+								{
+									"name": "FileLogDetailInsert",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[ProcessMetadata].[FileLogDetailInsert]",
+										"storedProcedureParameters": {
+											"ControlTableKey": {
+												"value": {
+													"value": "@variables('ControlTableKey')",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"FileName": {
+												"value": {
+													"value": "@variables('SourceTableName')",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"SourceTableName": {
+												"value": {
+													"value": "@{variables('SourceSchemaName')}.@{variables('SourceTableName')}",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "AZDatabase",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Log Success",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "File Extract",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[ProcessMetadata].[FileLogDetailUpdate]",
+										"storedProcedureParameters": {
+											"ControlTableKey": {
+												"value": {
+													"value": "@variables('ControlTableKey')",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"FileName": {
+												"value": {
+													"value": "@{variables('SourceTableName')}.txt",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"SourceTableName": {
+												"value": {
+													"value": "@{variables('SourceSchemaName')}.@{variables('SourceTableName')}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"Status": {
+												"value": "S",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "AZDatabase",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Log Failure",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "File Extract",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[ProcessMetadata].[FileLogDetailUpdate]",
+										"storedProcedureParameters": {
+											"ControlTableKey": {
+												"value": {
+													"value": "@variables('ControlTableKey')",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"FileName": {
+												"value": {
+													"value": "@{variables('SourceTableName')}.txt",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"SourceTableName": {
+												"value": {
+													"value": "@{variables('SourceSchemaName')}.@{variables('SourceTableName')}",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"Status": {
+												"value": "F",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "AZDatabase",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
 						}
