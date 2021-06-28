@@ -24,6 +24,12 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
+					},
+					{
+						"activity": "RunKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
 				"policy": {
@@ -755,6 +761,19 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "RunKey",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunKey",
+					"value": {
+						"value": "@pipeline().parameters.RunKey",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -803,6 +822,9 @@
 				"type": "String"
 			},
 			"TargetPassword": {
+				"type": "String"
+			},
+			"RunKey": {
 				"type": "String"
 			}
 		},
