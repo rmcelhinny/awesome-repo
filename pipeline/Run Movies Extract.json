@@ -60,6 +60,10 @@
 						"ProcessName": {
 							"value": "@activity('Movies Lookup').output.value[0].ProcessName",
 							"type": "Expression"
+						},
+						"RunKey": {
+							"value": "@activity('Movies Lookup').output.value[0].RunKey",
+							"type": "Expression"
 						}
 					}
 				}
