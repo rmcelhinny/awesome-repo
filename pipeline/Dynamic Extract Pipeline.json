@@ -637,6 +637,13 @@
 										},
 										"type": "String"
 									},
+									"ProcessName": {
+										"value": {
+											"value": "@variables('ProcessName')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
 									"RunKey": {
 										"value": {
 											"value": "@variables('RunKey')",
