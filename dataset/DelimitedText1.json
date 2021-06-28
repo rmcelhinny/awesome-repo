@@ -13,7 +13,7 @@
 				"fileName": "test.txt",
 				"container": "azureefileextract"
 			},
-			"columnDelimiter": "0x7f",
+			"columnDelimiter": "|",
 			"escapeChar": "\\",
 			"quoteChar": ""
 		},
