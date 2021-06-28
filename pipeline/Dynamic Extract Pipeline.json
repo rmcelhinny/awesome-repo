@@ -271,7 +271,12 @@
 									"partitionOption": "None"
 								},
 								"sink": {
-									"type": "AzureSqlSink"
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "delete from ProcessMetadata.SourceTableColumns where controltablekey = @{variables('ControlTableKey')}",
+										"type": "Expression"
+									},
+									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
 								"translator": {
