@@ -24,7 +24,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select distinct ProcessName, (select max(RunKey) RunKey from  ProcessMetadata.RunKey where processname = 'Movies' and Status = 'IP') RunKey\nfrom ProcessMetadata.ControlTable\nwhere ProcessName = 'Movies';",
+						"sqlReaderQuery": {
+							"value": "select distinct ProcessName, @{variables('RunKey')} as RunKey\nfrom ProcessMetadata.ControlTable\nwhere ProcessName = 'Movies';",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
