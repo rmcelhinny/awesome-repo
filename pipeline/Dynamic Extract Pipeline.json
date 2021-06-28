@@ -323,19 +323,19 @@
 										"TableSchema": "ProcessMetadata",
 										"TableName": "SourceTableColumns",
 										"ServerName": {
-											"value": "rmcelhinny-db.database.windows.net",
+											"value": "@variables('TargetServerName')",
 											"type": "Expression"
 										},
 										"DatabaseName": {
-											"value": "rmcelhinny-db",
+											"value": "@variables('TargetDatabaseName')",
 											"type": "Expression"
 										},
 										"UserName": {
-											"value": "rmcelhinny",
+											"value": "@variables('TargetUserName')",
 											"type": "Expression"
 										},
 										"Password": {
-											"value": "rmcelhinnyPWD",
+											"value": "@variables('TargetPassword')",
 											"type": "Expression"
 										}
 									}
