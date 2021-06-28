@@ -5,7 +5,14 @@
 			{
 				"name": "Movies Lookup",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "RunKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -17,7 +24,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select distinct ProcessName\nfrom ProcessMetadata.ControlTable\nwhere ProcessName = 'Movies';",
+						"sqlReaderQuery": "select distinct ProcessName, (select max(RunKey) RunKey from  ProcessMetadata.RunKey where processname = 'Movies' and Status = 'IP') RunKey\nfrom ProcessMetadata.ControlTable\nwhere ProcessName = 'Movies';",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -53,8 +60,64 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "Generate RunKey",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[ProcessMetadata].[LogRunKey]",
+						"storedProcedureParameters": {
+							"ProcessName": {
+								"type": "String",
+								"value": "Movies"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSQLDatabase",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "RunKey",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Generate RunKey",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RunKey",
+					"value": {
+						"value": "@replace(replace(string(activity('Generate RunKey').output.firstrow),'{\"\":\"',''),'\"}','')",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"RunKey": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Azure Extract"
 		},
