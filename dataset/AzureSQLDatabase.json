@@ -7,6 +7,63 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": []
+		"schema": [
+			{
+				"name": "ControlTableKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SourceTableSchema",
+				"type": "varchar"
+			},
+			{
+				"name": "SourceTableName",
+				"type": "varchar"
+			},
+			{
+				"name": "OrdinalPosition",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SourceColumn",
+				"type": "varchar"
+			},
+			{
+				"name": "SourceColumnDataType",
+				"type": "varchar"
+			},
+			{
+				"name": "Length",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Scale",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Nullable",
+				"type": "bit"
+			},
+			{
+				"name": "DatabricksDataTypeExternal",
+				"type": "varchar"
+			},
+			{
+				"name": "DatabricksDataType",
+				"type": "varchar"
+			},
+			{
+				"name": "SQLDataType",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "ProcessMetadata",
+			"table": "SourceTableColumns"
+		}
 	}
 }
