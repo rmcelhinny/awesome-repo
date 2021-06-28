@@ -224,6 +224,12 @@
 									"dependencyConditions": [
 										"Succeeded"
 									]
+								},
+								{
+									"activity": "TargetPassword",
+									"dependencyConditions": [
+										"Succeeded"
+									]
 								}
 							],
 							"userProperties": [],
