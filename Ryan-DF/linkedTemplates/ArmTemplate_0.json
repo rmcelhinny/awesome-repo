@@ -179,6 +179,41 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/BLOBExtract')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().FileName",
+							"type": "Expression"
+						},
+						"container": "azureefileextract"
+					},
+					"columnDelimiter": "",
+					"escapeChar": "\\",
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DynamicDataset')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -231,71 +266,6 @@
 				"typeProperties": {
 					"schema": {
 						"value": "@dataset().TableSchema",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().TableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/DynamicAzureDatabase')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DynamicSQLDataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DynamicAzureDatabase",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"ServerName": {
-							"value": "@dataset().ServerName",
-							"type": "Expression"
-						},
-						"DatabaseName": {
-							"value": "@dataset().DatabaseName",
-							"type": "Expression"
-						},
-						"UserName": {
-							"value": "@dataset().UserName",
-							"type": "Expression"
-						},
-						"Password": {
-							"value": "@dataset().Password",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"SchemaName": {
-						"type": "string"
-					},
-					"TableName": {
-						"type": "string"
-					},
-					"ServerName": {
-						"type": "string"
-					},
-					"DatabaseName": {
-						"type": "string"
-					},
-					"UserName": {
-						"type": "string"
-					},
-					"Password": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().SchemaName",
 						"type": "Expression"
 					},
 					"table": {
@@ -764,6 +734,153 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "Generate Text Files to BLOB",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Extract and Populate DDL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select \ncast(ct.ControlTableKey as varchar(10)) as ControlTableKey ,\nct.ProcessName,\nct.SourceSchemaName,\nct.SourceTableName,\nct.SourceServerName,\nct.SourceDatabaseName,\nct.SourceUserName,\nct.SourcePassword,\nct.TargetTableSchema,\nct.TargetTableName,\nct.TargetServerName,\nct.TargetDatabaseName,\nct.TargetUserName,\nct.TargetPassword,\nct.ContainerName,\nct.Delimiter,\nqg.FullSQLQuery\nfrom ProcessMetadata.ControlTable ct\njoin ProcessMetadata.QueryGeneration qg\non ct.ControlTableKey = qg.ControlTableKey\nand ct.SourceTableName = qg.SourceTableName\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSQLDatabase",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Extract Data",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Generate Text Files to BLOB",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Generate Text Files to BLOB').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "File Extract",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@item().FullSQLQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "DynamicDataset",
+											"type": "DatasetReference",
+											"parameters": {
+												"TableSchema": {
+													"value": "@variables('SourceSchemaName')",
+													"type": "Expression"
+												},
+												"TableName": {
+													"value": "@variables('SourceTableName')",
+													"type": "Expression"
+												},
+												"ServerName": {
+													"value": "@variables('SourceServerName')",
+													"type": "Expression"
+												},
+												"DatabaseName": {
+													"value": "@variables('SourceDatabaseName')",
+													"type": "Expression"
+												},
+												"UserName": {
+													"value": "@variables('SourceUserName')",
+													"type": "Expression"
+												},
+												"Password": {
+													"value": "@variables('SourcePassword')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "BLOBExtract",
+											"type": "DatasetReference",
+											"parameters": {
+												"FileName": {
+													"value": "@{variables('SourceTableName')}/@{variables('SourceTableName')}.txt",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
 					}
 				],
 				"parameters": {
@@ -820,7 +937,8 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/AzureSQLDatabase')]",
 				"[concat(variables('factoryId'), '/datasets/DynamicDataset')]",
-				"[concat(variables('factoryId'), '/linkedServices/AZDatabase')]"
+				"[concat(variables('factoryId'), '/linkedServices/AZDatabase')]",
+				"[concat(variables('factoryId'), '/datasets/BLOBExtract')]"
 			]
 		}
 	]
