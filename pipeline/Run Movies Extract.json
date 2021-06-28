@@ -118,6 +118,50 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Movies Extract",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[ProcessMetadata].[UpdateLogRunKey]",
+					"storedProcedureParameters": {
+						"ProcessName": {
+							"value": "Movies",
+							"type": "String"
+						},
+						"RunKey": {
+							"value": {
+								"value": "@variables('RunKey')",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"Status": {
+							"value": "S",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AZDatabase",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"variables": {
