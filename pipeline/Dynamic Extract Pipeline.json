@@ -16,7 +16,7 @@
 				}
 			},
 			{
-				"name": "Fetch MetaData",
+				"name": "Fetch Metadata",
 				"type": "Lookup",
 				"dependsOn": [
 					{
@@ -56,7 +56,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Fetch MetaData",
+						"activity": "Fetch Metadata",
 						"dependencyConditions": [
 							"Succeeded"
 						]
