@@ -29,7 +29,7 @@
 				}
 			},
 			{
-				"name": "Execute Pipeline1",
+				"name": "Movies Extract",
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
