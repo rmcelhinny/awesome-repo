@@ -466,13 +466,37 @@
 											"dependencyConditions": [
 												"Succeeded"
 											]
+										},
+										{
+											"activity": "TargetServerName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "TargetDatabaseName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "TargetUserName",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "TargetPassword",
+											"dependencyConditions": [
+												"Succeeded"
+											]
 										}
 									],
 									"userProperties": [],
 									"typeProperties": {
 										"variableName": "SysQuery",
 										"value": {
-											"value": "select\n@{variables('ControlTableKey')} as ControlTabkleKey,\nd.name as SourceColumnDataType,\nb.column_id as OrdinalPosition,\ncase when d.name like '%numeric%' OR d.name like '%float%' OR d.name like '%decimal%' then b.precision\n    WHEN D.name LIKE '%money%' THEN 34\nelse b.max_length end as Length,\nCASE WHEN D.name LIKE '%money%' THEN 4 ELSE b.scale end as Scale,\nb.is_nullable as Nullable,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%timestamp%' then 'string'  \n     when d.name like '%date%' then 'string'  \n     when d.name like '%time%' then 'string'  \n     when d.name like '%number%' then 'float'\n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataTypeExternal,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%time%' or d.name like '%date%' then 'timestamp'\n     when d.name like '%number%' then 'float'  \n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataType,\nd.name as SQLDataType\n from sys.tables a\njoin sys.columns b\non a.object_id = b.object_id\njoin sys.schemas c\non a.schema_id = c.schema_id\njoin sys.types d\non b.system_type_id = d.system_type_id\nwhere d.name <> 'sysname'\nand a.name = '@{variables('SourceTableName')}'",
+											"value": "select\n@{variables('ControlTableKey')} as ControlTabkleKey,\n@{variables('SourceSchemaName')} as SourceSchema,\n@{variables('SourceTableName')} as SourceTableName,\nd.name as SourceColumnDataType,\nb.column_id as OrdinalPosition,\ncase when d.name like '%numeric%' OR d.name like '%float%' OR d.name like '%decimal%' then b.precision\n    WHEN D.name LIKE '%money%' THEN 34\nelse b.max_length end as Length,\nCASE WHEN D.name LIKE '%money%' THEN 4 ELSE b.scale end as Scale,\nb.is_nullable as Nullable,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%timestamp%' then 'string'  \n     when d.name like '%date%' then 'string'  \n     when d.name like '%time%' then 'string'  \n     when d.name like '%number%' then 'float'\n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataTypeExternal,\ncase when d.name like '%varchar%' then 'string'\n     when d.name like '%time%' or d.name like '%date%' then 'timestamp'\n     when d.name like '%number%' then 'float'  \n     when d.name like '%bit%' then 'string'\n     WHEN D.name LIKE '%money%' THEN 'float'\nelse d.name end as DatabricksDataType,\nd.name as SQLDataType\n from sys.tables a\njoin sys.columns b\non a.object_id = b.object_id\njoin sys.schemas c\non a.schema_id = c.schema_id\njoin sys.types d\non b.system_type_id = d.system_type_id\nwhere d.name <> 'sysname'\nand a.name = '@{variables('SourceTableName')}'",
 											"type": "Expression"
 										}
 									}
@@ -559,24 +583,76 @@
 												"TableSchema": "ProcessMetadata",
 												"TableName": "SourceTableColumns",
 												"ServerName": {
-													"value": "@item().TargetServerName",
+													"value": "@variables('TargetServerName')",
 													"type": "Expression"
 												},
 												"DatabaseName": {
-													"value": "@item().TargetDatabaseName",
+													"value": "@variables('TargetDatabaseName')",
 													"type": "Expression"
 												},
 												"UserName": {
-													"value": "@item().TargetUserName",
+													"value": "@variables('TargetUserName')",
 													"type": "Expression"
 												},
 												"Password": {
-													"value": "@item().TargetPassword",
+													"value": "@variables('TargetPassword')",
 													"type": "Expression"
 												}
 											}
 										}
 									]
+								},
+								{
+									"name": "TargetServerName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TargetServerName",
+										"value": {
+											"value": "@item().TargetServerName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "TargetDatabaseName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TargetDatabaseName",
+										"value": {
+											"value": "@item().TargetDatabaseName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "TargetUserName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TargetUserName",
+										"value": {
+											"value": "@item().TargetUserName",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "TargetPassword",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "TargetPassword",
+										"value": {
+											"value": "@item().TargetPassword",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -613,6 +689,18 @@
 						"type": "String"
 					},
 					"ControlTableKey": {
+						"type": "String"
+					},
+					"TargetServerName": {
+						"type": "String"
+					},
+					"TargetDatabaseName": {
+						"type": "String"
+					},
+					"TargetUserName": {
+						"type": "String"
+					},
+					"TargetPassword": {
 						"type": "String"
 					}
 				},
