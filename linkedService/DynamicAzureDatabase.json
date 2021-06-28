@@ -30,6 +30,10 @@
 					"type": "Expression"
 				}
 			}
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime1",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
