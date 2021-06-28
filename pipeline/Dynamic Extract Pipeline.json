@@ -505,7 +505,66 @@
 						"value": "@activity('Generate Text Files to BLOB').output.value",
 						"type": "Expression"
 					},
-					"isSequential": true
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "File Extract",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@item().FullSQLQuery",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "DynamicDataset",
+									"type": "DatasetReference",
+									"parameters": {
+										"TableSchema": {
+											"value": "@variables('SourceSchemaName')",
+											"type": "Expression"
+										},
+										"TableName": {
+											"value": "@variables('SourceTableName')",
+											"type": "Expression"
+										},
+										"ServerName": {
+											"value": "@variables('SourceServerName')",
+											"type": "Expression"
+										},
+										"DatabaseName": {
+											"value": "@variables('SourceDatabaseName')",
+											"type": "Expression"
+										},
+										"UserName": {
+											"value": "@variables('SourceUserName')",
+											"type": "Expression"
+										},
+										"Password": {
+											"value": "@variables('SourcePassword')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
 				}
 			}
 		],
