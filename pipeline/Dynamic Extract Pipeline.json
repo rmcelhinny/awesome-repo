@@ -218,6 +218,12 @@
 									"dependencyConditions": [
 										"Succeeded"
 									]
+								},
+								{
+									"activity": "TargetUserName",
+									"dependencyConditions": [
+										"Succeeded"
+									]
 								}
 							],
 							"userProperties": [],
@@ -352,6 +358,19 @@
 								"variableName": "TargetDatabaseName",
 								"value": {
 									"value": "@item().TargetDatabaseName",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "TargetUserName",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "TargetUserName",
+								"value": {
+									"value": "@item().TargetUserName",
 									"type": "Expression"
 								}
 							}
