@@ -451,6 +451,62 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Generate Text Files to BLOB",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Extract and Populate DDL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select \ncast(ct.ControlTableKey as varchar(10)) as ControlTableKey ,\nct.ProcessName,\nct.SourceSchemaName,\nct.SourceTableName,\nct.SourceServerName,\nct.SourceDatabaseName,\nct.SourceUserName,\nct.SourcePassword,\nct.TargetTableSchema,\nct.TargetTableName,\nct.TargetServerName,\nct.TargetDatabaseName,\nct.TargetUserName,\nct.TargetPassword,\nct.ContainerName,\nct.Delimiter,\nqg.FullSQLQuery\nfrom ProcessMetadata.ControlTable ct\njoin ProcessMetadata.QueryGeneration qg\non ct.ControlTableKey = qg.ControlTableKey\nand ct.SourceTableName = qg.SourceTableName\nWhere IsIncludedinExtract = 1\nand ProcessName = '@{variables('ProcessName')}'\norder by 1",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSQLDatabase",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Extract Data",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Generate Text Files to BLOB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Generate Text Files to BLOB').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true
+				}
 			}
 		],
 		"parameters": {
